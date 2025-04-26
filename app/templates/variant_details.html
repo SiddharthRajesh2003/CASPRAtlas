@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block title %}Variant Details{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{{ url_for('cas_variants') }}" class="text-decoration-none">Cas Variants</a></li>
+                    <li class="breadcrumb-item active">{{ variant.CAS_VARIANT }}</li>
+                </ol>
+            </nav>
+            <h2 class="mb-1">Variant Details</h2>
+            <p class="text-muted mb-0">Detailed information about {{ variant.CAS_VARIANT }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary rounded-pill px-4" onclick="window.print()">
+                <i class="bi bi-printer me-2"></i>Export
+            </button>
+        </div>
+    </div>
+
+    <!-- Variant Details Card -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4">
+        <div class="card-body p-4">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="text-muted small mb-1">ID</label>
+                        <div>
+                            <span class="badge bg-primary-subtle text-primary rounded-pill">{{ variant.UNIQUE_ID }}</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small mb-1">Organism</label>
+                        <div class="text-secondary">{{ variant.ORGANISM }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small mb-1">Sequence ID</label>
+                        <div>
+                            {% if variant.SEQ_ID %}
+                                <span class="badge bg-success-subtle text-success rounded-pill">{{ variant.SEQ_ID }}</span>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="text-muted small mb-1">Structure ID</label>
+                        <div>
+                            {% if variant.STRUCTURE_ID %}
+                                <span class="badge bg-info-subtle text-info rounded-pill">{{ variant.STRUCTURE_ID }}</span>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small mb-1">PAM</label>
+                        <div>
+                            {% if variant.PAM_RECOG %}
+                                <code class="bg-light rounded px-2 py-1">{{ variant.PAM_RECOG }}</code>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small mb-1">Function</label>
+                        <div>
+                            <span class="badge bg-secondary-subtle text-secondary rounded-pill">{{ variant.CAS_TYPE }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Papers Card -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4">
+        <div class="card-body p-0">
+            <div class="d-flex justify-content-between align-items-center px-4 py-3 border-bottom">
+                <h3 class="h5 mb-0">Related Papers</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead>
+                        <tr class="bg-light">
+                            <th class="px-4 py-3">Title</th>
+                            <th class="py-3">Paper ID</th>
+                            <th class="py-3">Year</th>
+                            <th class="py-3">Author</th>
+                            <th class="py-3">Journal</th>
+                            <th class="py-3">Organism</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for paper in papers %}
+                        <tr class="hover-row">
+                            <td class="px-4">{{ paper.TITLE }}</td>
+                            <td>
+                                <a href="{{ url_for('check_paper', pm_id=paper.PUBMED_ID) }}" 
+                                   class="btn btn-outline-primary btn-sm rounded-pill"
+                                   target="_blank">
+                                    <i class="bi bi-journal-text me-2"></i>{{ paper.PUBMED_ID }}
+                                </a>
+                            </td>
+                            <td>{{ paper.YEAR.strftime('%Y') if paper.YEAR else 'N/A' }}</td>
+                            <td class="text-secondary">{{ paper.AUTHOR }}</td>
+                            <td class="text-secondary">{{ paper.JOURNAL }}</td>
+                            <td class="text-secondary">{{ paper.ORGANISM }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Datasets Card -->
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body p-0">
+            <div class="d-flex justify-content-between align-items-center px-4 py-3 border-bottom">
+                <h3 class="h5 mb-0">Related Datasets</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead>
+                        <tr class="bg-light">
+                            <th class="px-4 py-3">Data ID</th>
+                            <th class="py-3">Paper</th>
+                            <th class="py-3">Paper ID</th>
+                            <th class="py-3">Organism</th>
+                            <th class="py-3">Download</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dataset in datasets %}
+                        <tr class="hover-row">
+                            <td class="px-4 fw-medium">{{ dataset.DATA_ID }}</td>
+                            <td>{{ dataset.TITLE }}</td>
+                            <td>
+                                <a href="{{ url_for('check_paper', pm_id=dataset.PM_ID) }}" 
+                                   class="btn btn-outline-primary btn-sm rounded-pill"
+                                   target="_blank">
+                                    <i class="bi bi-journal-text me-2"></i>{{ dataset.PM_ID }}
+                                </a>
+                            </td>
+                            <td class="text-secondary">{{ dataset.ORGANISM }}</td>
+                            <td>
+                                <a href="{{ dataset.DATASET_FILE }}" 
+                                   class="btn btn-primary btn-sm rounded-pill">
+                                    <i class="bi bi-download me-2"></i>Download
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-row {
+    transition: background-color 0.2s ease-in-out;
+}
+
+.hover-row:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table th {
+    font-weight: 600;
+    color: #666;
+    border-top: none;
+}
+
+.table td {
+    border-color: #f0f0f0;
+}
+
+.badge {
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+/* Custom badge background colors */
+.bg-primary-subtle {
+    background-color: #e8f0fe;
+}
+
+.bg-success-subtle {
+    background-color: #e6f4ea;
+}
+
+.bg-info-subtle {
+    background-color: #e8f0fe;
+}
+
+.bg-secondary-subtle {
+    background-color: #f1f3f4;
+}
+
+/* Code styling */
+code {
+    font-size: 0.875rem;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+}
+</style>
+{% endblock %}

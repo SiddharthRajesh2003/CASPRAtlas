@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+
+{% block title %}Home - CASPRAtlas{% endblock %}
+
+{% block content %}
+<div class = 'container mt-5'>
+    <div class="row mb-5">
+        <div class="col-lg- mx-auto text-center">
+            <h1 class="display-5 fw-bold mb-3">Welcome to CASPRAtlas</h1>
+            <p class="lead text-muted mb-4">
+                Mapping the diversity of CRISPR-Cas systems across the tree of life
+            </p>
+            <div class="d-flex justify-content-center gap-4">
+                <div class="text-center">
+                    <h3 class="fw-bold text-primary mb-1">{{papers|length}}</h3>
+                    <p class="text-muted small">Publications</p>
+                </div>
+                <div class="text-center">
+                    <h3 class="fw-bold text-primary mb-1">{{cas_variants|length}}</h3>
+                    <p class="text-muted small">Variants</p>
+                </div>
+                <div class="text-center">
+                    <h3 class="fw-bold text-primary mb-1">{{datasets|length}}</h3>
+                    <p class="text-muted small">Datasets</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {%if is_home%}
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+                <div class="card-body p-4">
+                    <form action="{{url_for('search')}}" class="d-flex gap-2" method="GET">
+                        <input type="text" name="query" class="form-control form-control-lg rounded-pill"
+                        placeholder="Search for papers, datasets or variants"
+                        aria-label="Search">
+                        <button class="btn btn-primary rounded-pill px-4" type="submit">
+                            <i class="bi bi-search me-2"></i>Search
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {%endif%}
+
+    <!-- Integrated Resources Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+                <div class="card-header bg-white border-0 p-4 d-flex justify-content-between align-items-center">
+                    <h3 class="h4 mb-0">Latest Additions</h3>
+                    <div class="content-tabs">
+                        <button class="btn btn-sm btn-outline-primary active" data-content-target="papers">Papers</button>
+                        <button class="btn btn-sm btn-outline-primary ms-2" data-content-target="variants">Variants</button>
+                        <button class="btn btn-sm btn-outline-primary ms-2" data-content-target="datasets">Datasets</button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <!-- Papers Tab Content -->
+                    <div id="papers-content" class="content-section">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="ps-4">Title</th>
+                                        <th>Author</th>
+                                        <th>Year</th>
+                                        <th>Journal</th>
+                                        <th class="text-end pe-4">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for paper in featured_papers[:5] %}
+                                    <tr class="hover-row">
+                                        <td class="ps-4">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-journal-text text-primary me-2"></i>
+                                                <span class="text-truncate" style="max-width: 300px;" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ paper.TITLE }}">
+                                                    {{ paper.TITLE }}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>{{ paper.AUTHOR }}</td>
+                                        <td>{{ paper.YEAR.strftime('%Y') }}</td>
+                                        <td>{{ paper.JOURNAL }}</td>
+                                        <td class="text-end pe-4">
+                                            <a href="{{ url_for('check_paper', pm_id=paper.PUBMED_ID) }}" class="btn btn-sm btn-outline-primary rounded-pill" target="_blank">
+                                                View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="border-top">
+                            <div class="card border-0 shadow-sm rounded-3 hover-card m-4">
+                                <div class="card-body p-4 text-center">
+                                    <div class="rounded-circle bg-primary-subtle p-3 d-inline-flex mb-3">
+                                        <i class="bi bi-journal-text text-primary fs-3"></i>
+                                    </div>
+                                    <h3 class="card-title h4 mb-3">Research Papers</h3>
+                                    <p class="card-text text-muted mb-4">
+                                        View research papers on bioinformatics analysis on CRISPR-Cas data
+                                    </p>
+                                    <a href="{{url_for('papers')}}" class="btn btn-outline-primary rounded-pill px-4">
+                                        View all papers
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Variants Tab Content -->
+                    <div id="variants-content" class="content-section d-none">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="ps-4">Variant</th>
+                                        <th>ID</th>
+                                        <th>Organism</th>
+                                        <th>PAM</th>
+                                        <th>Type</th>
+                                        <th class="text-end pe-4">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for variant in featured_variants[:5] %}
+                                    <tr class="hover-row">
+                                        <td class="ps-4">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-diagram-3 text-success me-2"></i>
+                                                <span>{{ variant.CAS_VARIANT }}</span>
+                                            </div>
+                                        </td>
+                                        <td>{{ variant.UNIQUE_ID }}</td>
+                                        <td>{{ variant.ORGANISM }}</td>
+                                        <td>{{ variant.PAM_RECOG }}</td>
+                                        <td>{{ variant.CAS_TYPE }}</td>
+                                        <td class="text-end pe-4">
+                                            <a href="{{ url_for('show_variant_details', variant_id=variant.UNIQUE_ID) }}" class="btn btn-sm btn-outline-success rounded-pill">
+                                                View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="border-top">
+                            <div class="card border-0 shadow-sm rounded-3 hover-card m-4">
+                                <div class="card-body p-4 text-center">
+                                    <div class="rounded-circle bg-primary-subtle p-3 d-inline-flex mb-3">
+                                        <i class="bi bi-diagram-3 text-success fs-3"></i>
+                                    </div>
+                                    <h3 class="card-title h4 mb-3">Cas Variants</h3>
+                                    <p class="card-text text-muted mb-4">
+                                        Browse and explore CRISPR-associated protein variants
+                                    </p>
+                                    <a href="{{url_for('cas_variants')}}" class="btn btn-outline-primary rounded-pill px-4">
+                                        View all variants
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Datasets Tab Content -->
+                    <div id="datasets-content" class="content-section d-none">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="ps-4">Dataset ID</th>
+                                        <th>Paper</th>
+                                        <th>Organism</th>
+                                        <th class="text-end pe-4">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for dataset in featured_datasets[:5] %}
+                                    <tr class="hover-row">
+                                        <td class="ps-4">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-cloud-download text-info me-2"></i>
+                                                <span>{{ dataset.DATA_ID }}</span>
+                                            </div>
+                                        </td>
+                                        <td>{{dataset.TITLE}}</td>
+                                        <td>{{ dataset.ORGANISM }}</td>
+                                        <td class="text-end pe-4">
+                                            <a href="{{ url_for('view_dataset', data_id=dataset.DATA_ID) }}" class="btn btn-sm btn-outline-info rounded-pill">
+                                                View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="border-top">
+                            <div class="card border-0 shadow-sm rounded-3 hover-card m-4">
+                                <div class="card-body p-4 text-center">
+                                    <div class="rounded-circle bg-primary-subtle p-3 d-inline-flex mb-3">
+                                        <i class="bi bi-cloud-download text-info fs-3"></i>
+                                    </div>
+                                    <h3 class="card-title h4 mb-3">Datasets</h3>
+                                    <p class="card-text text-muted mb-4">
+                                        View and download the datasets related to the papers
+                                    </p>
+                                    <a href="{{url_for('datasets')}}" class="btn btn-outline-primary rounded-pill px-4">
+                                        View all datasets
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>  
+</div>
+<style>
+/* Base styles */
+.hover-row {
+    transition: background-color 0.2s ease-in-out;
+}
+
+.hover-row:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.hover-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Colors */
+.bg-primary-subtle {
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.bg-success-subtle {
+    background-color: rgba(25, 135, 84, 0.1);
+}
+
+.bg-info-subtle {
+    background-color: rgba(13, 202, 240, 0.1);
+}
+
+.bg-secondary-subtle {
+    background-color: rgba(108, 117, 125, 0.1);
+}
+
+/* Table customizations */
+.table th {
+    font-weight: 600;
+    color: #666;
+    border-top: none;
+}
+
+.table td {
+    vertical-align: middle;
+    border-color: #f0f0f0;
+}
+
+/* Content tabs */
+.content-tabs .btn.active {
+    background-color: var(--bs-primary);
+    color: white;
+}
+
+/* Truncate long text */
+.text-truncate {
+    max-width: 300px;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+    
+    // Content tabs functionality
+    const contentTabs = document.querySelectorAll('.content-tabs .btn');
+    const contentSections = document.querySelectorAll('.content-section');
+    
+    contentTabs.forEach(button => {
+        button.addEventListener('click', function() {
+            // Update active button
+            contentTabs.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Show correct content section
+            const target = this.getAttribute('data-content-target');
+            contentSections.forEach(section => {
+                section.classList.add('d-none');
+            });
+            document.getElementById(`${target}-content`).classList.remove('d-none');
+        });
+    });
+});
+</script>
+{% endblock %}

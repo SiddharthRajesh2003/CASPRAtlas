@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Datasets{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Dataset Downloads</h2>
+            <p class="text-muted mb-0">Access experimental datasets related to CRISPR-Cas research</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary rounded-pill px-4" onclick="window.print()">
+                <i class="bi bi-printer me-2"></i>Export
+            </button>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr class="bg-light">
+                            <th class="px-4 py-3">Data ID</th>
+                            <th class="py-3">Paper</th>
+                            <th class="py-3">Cas Variant</th>
+                            <th class="py-3">Paper ID</th>
+                            <th class="py-3">Organism</th>
+                            <th class="py-3">Dataset</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in datasets %}
+                        <tr class="hover-row">
+                            <td class="px-4">
+                                <span class="badge bg-info-subtle text-info rounded-pill">
+                                    <a href="{{ url_for('view_dataset', data_id=data.DATA_ID) }}" class="text-info text-decoration-none">
+                                        <i class="bi bi-cloud-download text-info me-2"></i> {{ data.DATA_ID }}
+                                    </a>
+                                </span>
+                            </td>                            
+                            <td class="text-wrap" style="max-width: 300px;">
+                                <span class="fw-medium">{{data.TITLE}}</span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('show_variant_details', variant_id=data.Variants) }}" 
+                                   class="btn btn-sm btn-link text-decoration-none p-0">
+                                    <span class="badge bg-primary-subtle text-primary rounded-pill">
+                                        <i class="bi bi-diagram-3 me-1"></i>{{data.Variants}}
+                                    </span>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('check_paper', pm_id=data.PM_ID) }}" 
+                                   class="btn btn-sm btn-link text-decoration-none"
+                                   target="_blank">
+                                    <span class="badge bg-secondary-subtle text-secondary rounded-pill">
+                                        <i class="bi bi-journal-text me-1"></i>{{data.PM_ID}}
+                                    </span>
+                                </a>
+                            </td>
+                            <td class="text-secondary">{{data.ORGANISM}}</td>
+                            <td>
+                                <a href="{{ data.DATASET_FILE }}" 
+                                   class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                   data-bs-toggle="tooltip"
+                                   title="Download dataset">
+                                    <i class="bi bi-download me-1"></i>Download
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-row {
+    transition: background-color 0.2s ease-in-out;
+}
+
+.hover-row:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table th {
+    font-weight: 600;
+    color: #666;
+    border-top: none;
+}
+
+.table td {
+    border-color: #f0f0f0;
+}
+
+.badge {
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.bg-primary-subtle {
+    background-color: #e8f0fe;
+}
+
+.bg-info-subtle {
+    background-color: #e8f0fe;
+}
+
+.bg-secondary-subtle {
+    background-color: #f1f3f4;
+}
+
+.btn-outline-primary:hover {
+    transform: translateY(-1px);
+    transition: transform 0.2s ease-in-out;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+})
+</script>
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Cas Protein Files{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Cas Protein Files</h2>
+            <p class="text-muted mb-0">Access protein sequences and structure information for Cas variants</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary rounded-pill px-4" onclick="window.print()">
+                <i class="bi bi-printer me-2"></i>Export
+            </button>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr class="bg-light">
+                            <th class="px-4 py-3">Variant ID</th>
+                            <th class="py-3">Cas Protein</th>
+                            <th class="py-3">Uniprot ID</th>
+                            <th class="py-3">Structure ID</th>
+                            <th class="py-3">Organism</th>
+                            <th class="py-3" colspan="2">Files</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cas in cas_seqs %}
+                        <tr class="hover-row">
+                            <td class="px-4">
+                                <a href="{{ url_for('show_variant_details', variant_id=cas.Variant) }}" 
+                                   class="btn btn-sm btn-link text-decoration-none">
+                                    <span class="badge bg-primary-subtle text-primary rounded-pill">
+                                        <i class="bi bi-diagram-3 me-1"></i>{{cas.Variant}}
+                                    </span>
+                                </a>
+                            </td>
+                            <td>
+                                <span class="fw-medium">{{cas.Protein}}</span>
+                            </td>
+                            <td>
+                                {% if cas.UNIPROT_ID %}
+                                    <a href="{{ url_for('show_uniprot', uniprot_id=cas.UNIPROT_ID) }}" 
+                                    class="btn btn-sm btn-link text-decoration-none" target="_blank">
+                                    <span class="badge bg-info-subtle text-info rounded-pill">
+                                        {{cas.UNIPROT_ID}}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if cas.PDB_ID %}
+                                    <a href="{{ url_for('show_pdb', pdb_id=cas.PDB_ID) }}" 
+                                        class="btn btn-sm btn-link text-decoration-none" target="_blank">
+                                        <span class="badge bg-success-subtle text-success rounded-pill">
+                                            {{cas.PDB_ID}}
+                                        </span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="text-secondary">{{cas.Organism}}</span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{{ cas.FASTA_FILE }}" 
+                                       class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                       data-bs-toggle="tooltip"
+                                       title="Download FASTA sequence file">
+                                        <i class="bi bi-file-text me-1"></i>FASTA
+                                    </a>
+                                    <a href="{{ cas.PDB_FILE }}" 
+                                       class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                       data-bs-toggle="tooltip"
+                                       title="Download PDB structure file">
+                                        <i class="bi bi-cube me-1"></i>PDB
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-row {
+    transition: background-color 0.2s ease-in-out;
+}
+
+.hover-row:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table th {
+    font-weight: 600;
+    color: #666;
+    border-top: none;
+}
+
+.table td {
+    border-color: #f0f0f0;
+}
+
+.badge {
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+/* Custom badge colors */
+.bg-primary-subtle {
+    background-color: #e8f0fe;
+}
+
+.bg-info-subtle {
+    background-color: #e8f0fe;
+}
+
+.bg-success-subtle {
+    background-color: #e6f4ea;
+}
+
+/* Button hover effects */
+.btn-outline-primary:hover {
+    transform: translateY(-1px);
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Tooltip styling */
+.tooltip {
+    font-size: 0.875rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+})
+</script>
+{% endblock %}

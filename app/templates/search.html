@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    {% if query %}
+        <div class="d-flex align-items-center mb-4">
+            <h1 class="h3 mb-0 me-3">Search Results</h1>
+            <span class="badge bg-secondary rounded-pill fs-6">{{ query }}</span>
+        </div>
+    {% endif %}
+    
+    {% if results %}
+        <!-- CAS Variants Results -->
+        {% if results.cas_variants %}
+            <div class="card mb-4 border-0 shadow-sm rounded-3 overflow-hidden">
+                <div class="card-header border-0 py-3" style="background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-diagram-3 text-white me-2 fs-4"></i>
+                        <h3 class="card-title mb-0 text-white">CAS Variants</h3>
+                        <span class="ms-2 badge bg-white text-primary rounded-pill">{{ results.cas_variants|length }}</span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="px-4">Variant ID</th>
+                                    <th>Type</th>
+                                    <th>Organism</th>
+                                    <th class="text-end px-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for variant in results.cas_variants %}
+                                <tr>
+                                    <td class="px-4 fw-medium">{{ variant.UNIQUE_ID }}</td>
+                                    <td><span class="badge bg-light text-dark">{{ variant.CAS_TYPE }}</span></td>
+                                    <td>{{ variant.ORGANISM }}</td>
+                                    <td class="text-end px-4">
+                                        <a href="{{ url_for('show_variant_details', variant_id=variant.UNIQUE_ID) }}" 
+                                           class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                            <i class="bi bi-info-circle me-1"></i> Details
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Papers Results -->
+        {% if results.papers %}
+            <div class="card mb-4 border-0 shadow-sm rounded-3 overflow-hidden">
+                <div class="card-header border-0 py-3" style="background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-file-earmark-text text-white me-2 fs-4"></i>
+                        <h3 class="card-title mb-0 text-white">Papers</h3>
+                        <span class="ms-2 badge bg-white text-success rounded-pill">{{ results.papers|length }}</span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="px-4">Title</th>
+                                    <th>PubMed ID</th>
+                                    <th>CAS Variant</th>
+                                    <th class="text-end px-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for paper in results.papers %}
+                                <tr>
+                                    <td class="px-4">{{ paper.TITLE }}</td>
+                                    <td><span class="badge bg-light text-dark">{{ paper.PUBMED_ID }}</span></td>
+                                    <td>
+                                        {% if paper.CAS_PROTEIN %}
+                                            <a href="{{ url_for('show_variant_details', variant_id=paper.CAS_PROTEIN) }}"
+                                               class="text-decoration-none">
+                                                {{ paper.CAS_PROTEIN }}
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">Not specified</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end px-4">
+                                        <a href="{{ url_for('check_paper', pm_id=paper.PUBMED_ID) }}" 
+                                           class="btn btn-sm btn-outline-success rounded-pill px-3" 
+                                           target="_blank">
+                                            <i class="bi bi-file-earmark-text me-1"></i> View Paper
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        
+        {% if not results.cas_variants and not results.papers %}
+            <div class="card border-0 shadow-sm rounded-3 bg-light">
+                <div class="card-body p-4">
+                    <div class="text-center">
+                        <i class="bi bi-search display-4 text-muted mb-3"></i>
+                        <h4 class="mb-3">No results found for "{{ query }}"</h4>
+                        <p class="text-muted mb-4">Try adjusting your search terms or browse our suggestions below.</p>
+                        <div class="row g-4 justify-content-center">
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center p-4">
+                                        <div class="rounded-circle bg-primary-subtle p-3 d-inline-flex mb-3">
+                                            <i class="bi bi-spellcheck mb-3 fs-3 text-primary"></i>
+                                        </div>
+                                        <h3>Check spelling</h3>
+                                        <p class="text-muted mb-0">Make sure all words are spelled correctly</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center p-4">
+                                        <div class="rounded-circle bg-primary-subtle p-3 d-inline-flex mb-3">
+                                            <i class="bi bi-zoom-out mb-3 fs-3 text-primary"></i>
+                                        </div>
+                                        <h3>Broaden search</h3>
+                                        <p class="text-muted mb-0">Try more general keywords</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm rounded-3 hover-card">
+                                    <div class="card-body p-4 text-center">
+                                        <div class="rounded-circle bg-primary-subtle p-3 d-inline-flex mb-3">
+                                            <i class="bi bi-journal-text text-primary fs-3">
+                                            </i>
+                                        </div>
+                                        <h3 class="card-title h4 mb-3">Research Papers</h3>
+                                        <p class="card-text text-muted mb-4">
+                                            Surf through papers to find associated data
+                                        </p>
+                                        <a href="{{url_for('papers')}}" class="btn btn-outline-primary rounded-pill px-4">
+                                            View all papers
+                                        </a>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        
+    {% else %}
+        <div class="card border-0 shadow-sm rounded-3 bg-light">
+            <div class="card-body p-5">
+                <div class="text-center mb-5">
+                    <i class="bi bi-search display-3 text-primary mb-4"></i>
+                    <h2 class="mb-4">Search the CRISPR-DB Database</h2>
+                    <p class="lead text-muted">Discover CAS variants, research papers, and related data</p>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm hover-lift">
+                            <div class="card-body text-center p-4">
+                                <i class="bi bi-diagram-3 display-6 text-primary mb-3"></i>
+                                <h5>CAS Variants</h5>
+                                <p class="text-muted mb-0">Search by variant ID, type, or organism</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm hover-lift">
+                            <div class="card-body text-center p-4">
+                                <i class="bi bi-file-earmark-text display-6 text-primary mb-3"></i>
+                                <h5>Papers</h5>
+                                <p class="text-muted mb-0">Search by title, PubMed ID, or associated variant</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm hover-lift">
+                            <div class="card-body text-center p-4">
+                                <i class="bi bi-database display-6 text-primary mb-3"></i>
+                                <h5>Related Data</h5>
+                                <p class="text-muted mb-0">Find datasets and structures related to your search</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    /* Base styles matching other pages */
+    .hover-row {
+        transition: background-color 0.2s ease-in-out;
+    }
+    
+    .hover-row:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    .table th {
+        font-weight: 600;
+        color: #666;
+        border-top: none;
+    }
+    
+    .table td {
+        border-color: #f0f0f0;
+    }
+    
+    .badge {
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+    
+    .bg-primary-subtle {
+        background-color: #e8f0fe;
+    }
+    
+    .bg-info-subtle {
+        background-color: #e8f0fe;
+    }
+    
+    .bg-success-subtle {
+        background-color: #e6f4ea;
+    }
+    
+    .bg-secondary-subtle {
+        background-color: #f1f3f4;
+    }
+    
+    /* Home page specific styles */
+    .hover-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05) !important;
+    }
+    
+    .btn-outline-primary:hover {
+        transform: translateY(-1px);
+        transition: transform 0.2s ease-in-out;
+    }
+    </style>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    })
+    </script>
+    {% endblock %}

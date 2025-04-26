@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Papers{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Research Papers</h2>
+            <p class="text-muted mb-0">Browse published research papers related to CRISPR-Cas systems</p>
+        </div>
+        <div class="d-flex gap-2">
+            <form method="get" class="d-flex align-items-center">
+                <select name="year" class="form-select form-select-sm me-2" style="width: 120px;" onchange="this.form.submit()">
+                    <option value="">All Years</option>
+                    {% for year in years %}
+                    <option value="{{ year }}" {% if selected_year == year %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+                <button class="btn btn-outline-primary rounded-pill px-4" onclick="window.print()">
+                    <i class="bi bi-printer me-2"></i>Export
+                </button>
+            </form>            
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+        <div class="card-body p-0">
+            {% if papers %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr class="bg-light">
+                            <th class="px-4 py-3">Paper ID</th>
+                            <th class="py-3">Title</th>
+                            <th class="py-3">Year</th>
+                            <th class="py-3">Author</th>
+                            <th class="py-3">Journal</th>
+                            <th class="py-3">Organism</th>
+                            <th class="py-3">Cas Variant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for paper in papers %}
+                        <tr class="hover-row">
+                            <td class="px-4">
+                                <a href="{{ url_for('check_paper', pm_id=paper.PUBMED_ID)}}" 
+                                   class="btn btn-sm btn-link text-decoration-none"
+                                   target="_blank">
+                                    <span class="badge bg-info-subtle text-info rounded-pill">
+                                        <i class="bi bi-journal-text me-1"></i>{{paper.PUBMED_ID}}
+                                    </span>
+                                </a>
+                            </td>
+                            <td class="text-wrap" style="max-width: 300px;">
+                                <span class="fw-medium">{{paper.TITLE}}</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary-subtle text-secondary rounded-pill">
+                                    {{paper.YEAR.strftime('%Y') if paper.YEAR else '-'}}
+                                </span>
+                            </td>
+                            <td class="text-secondary">{{paper.AUTHOR}}</td>
+                            <td>
+                                <span class="badge bg-light text-dark">{{paper.JOURNAL}}</span>
+                            </td>
+                            <td class="text-secondary">{{paper.ORGANISM}}</td>
+                            <td>
+                                <a href="{{ url_for('show_variant_details', variant_id=paper.CAS_PROTEIN) }}" 
+                                   class="btn btn-sm btn-link text-decoration-none p-0">
+                                    <span class="badge bg-primary-subtle text-primary rounded-pill">
+                                        <i class="bi bi-diagram-3 me-1"></i>{{paper.CAS_PROTEIN}}
+                                    </span>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-4 text-center text-muted">
+                No papers found for the selected year.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-row {
+    transition: background-color 0.2s ease-in-out;
+}
+
+.hover-row:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table th {
+    font-weight: 600;
+    color: #666;
+    border-top: none;
+}
+
+.table td {
+    border-color: #f0f0f0;
+}
+
+.badge {
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.bg-primary-subtle {
+    background-color: #e8f0fe;
+}
+
+.bg-info-subtle {
+    background-color: #e8f0fe;
+}
+
+.bg-secondary-subtle {
+    background-color: #f1f3f4;
+}
+</style>
+{% endblock %}

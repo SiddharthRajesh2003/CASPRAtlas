@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Cas Variants{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Cas Variants</h2>
+            <p class="text-muted mb-0">Browse and explore CRISPR-associated protein variants</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary rounded-pill px-4" onclick="window.print()">
+                <i class="bi bi-printer me-2"></i>Export
+            </button>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead>
+                        <tr class="bg-light">
+                            <th class="px-4 py-3">ID</th>
+                            <th class="py-3">Cas Variant</th>
+                            <th class="py-3">Organism</th>
+                            <th class="py-3">Sequence ID</th>
+                            <th class="py-3">Structure</th>
+                            <th class="py-3">PAM</th>
+                            <th class="py-3">Function</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for variant in cas_variants %}
+                        <tr class="hover-row">
+                            <td class="px-4">
+                                <a href="{{ url_for('show_variant_details', variant_id=variant.UNIQUE_ID) }}" 
+                                   class="text-decoration-none d-flex align-items-center gap-2">
+                                    <span class="badge bg-primary-subtle text-primary rounded-pill">
+                                        {{variant.UNIQUE_ID}}
+                                    </span>
+                                </a>
+                            </td>
+                            <td>
+                                <span class="fw-medium">{{variant.CAS_VARIANT}}</span>
+                            </td>
+                            <td>
+                                <span class="text-secondary">{{variant.ORGANISM}}</span>
+                            </td>
+                            <td>
+                                {% if variant.SEQ_ID %}
+                                    <a href="{{ url_for('show_uniprot', uniprot_id=variant.SEQ_ID) }}" 
+                                    class="btn btn-sm btn-link text-decoration-none" target="_blank">
+                                    <span class="badge bg-info-subtle text-info rounded-pill">
+                                        {{variant.SEQ_ID}}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if variant.STRUCTURE_ID %}
+                                    <a href="{{ url_for('show_pdb', pdb_id=variant.STRUCTURE_ID) }}" 
+                                        class="btn btn-sm btn-link text-decoration-none" target="_blank">
+                                        <span class="badge bg-success-subtle text-success rounded-pill">
+                                            {{variant.STRUCTURE_ID}}
+                                        </span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if variant.PAM_RECOG %}
+                                    <code class="bg-light rounded px-2 py-1">{{variant.PAM_RECOG}}</code>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary-subtle text-secondary rounded-pill">
+                                    {{variant.CAS_TYPE}}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-row {
+    transition: background-color 0.2s ease-in-out;
+}
+
+.hover-row:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table th {
+    font-weight: 600;
+    color: #666;
+    border-top: none;
+}
+
+.table td {
+    border-color: #f0f0f0;
+}
+
+.badge {
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+/* Custom badge background colors */
+.bg-primary-subtle {
+    background-color: #e8f0fe;
+}
+
+.bg-success-subtle {
+    background-color: #e6f4ea;
+}
+
+.bg-info-subtle {
+    background-color: #e8f0fe;
+}
+
+.bg-secondary-subtle {
+    background-color: #f1f3f4;
+}
+
+/* Code styling */
+code {
+    font-size: 0.875rem;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+}
+</style>
+{% endblock %}
